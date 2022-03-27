@@ -1,75 +1,79 @@
-from black_jack_arts import logo
+# Hint 4 : Create a deal_card() function that uses the List below to **return
+# a random card
+from black_Jack_arts import logo
 import random
-print(logo)
-# These are the available cards from which 2 cards for user is selected and 2 cards for computer is selected
-user_cards = []
-computer_cards = []
-is_game_finished = False
+import os
 user_restart = 'y'
 
+
+def clear_screen():
+    os.system('clear')
+
+
 def deal_card():
-    """Returns a random card from the deck"""
+    """Returns a card from the deck."""
     cards = [11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10]
-    card = random.choice(cards)
-    return card
-
-
+    return random.choice(cards)
 
 
 def calculate_score(card_list):
-    """This function takes card list and calculates the sum of the cards"""
-    if 11 in card_list and 10 in card_list and len(card_list) == 2:
+    """Calculates score from the card list."""
+    # Returns 0 for blackjack
+    if len(card_list) == 2 and (11 in card_list and 10 in card_list):
         return 0
-    if 11 in card_list:
-        if sum(card_list) > 21:
-            card_list.remove(11)
-            card_list.append(1)
+    elif 11 in card_list and sum(card_list) > 21:
+        # Replace 11 with 1
+        card_list.remove(11)
+        card_list.append(1)
     return sum(card_list)
 
 
-def compare(us_score, comp_score):
-    if us_score > 21:
-        return "SORRY ! you lost"
-    elif comp_score > 21:
-        return "HURRAY !! You won"
-    elif us_score == comp_score:
-        return "Match Drawn"
-    elif us_score == 0:
-        return "HURRAY !! Blackjack"
-    elif comp_score == 0:
-        return "Sorry !! Computer has got blackjack"
-    elif us_score > comp_score:
-        return "HURRAY !!You won"
-    elif us_score < comp_score:
-        return "Sorry !! You lost"
+def compare(user_total, computer_total):
+    if user_total > 21:
+        return "You lose."
+    elif computer_total > 21:
+        return "Hurray !! You win"
+    elif user_total == computer_total:
+        return "Match drawn"
+    elif user_total == 0:
+        return "Hurray !!! You win."
+    elif computer_total == 0:
+        return "You lose"
+    elif user_total > computer_total:
+        return "Hurray !!! You win."
+    else:
+        return "Sorry you lose."
 
 
 while user_restart == 'y':
-
-    for _ in range(2):
-        user_cards.append(deal_card())
-        computer_cards.append(deal_card())
-
-    while not is_game_finished:
-        user_score = calculate_score(user_cards)
-        computer_score = calculate_score(computer_cards)
-        print(f"Your cards {user_cards}, score {user_score}")
-        print(f"Computer's first card {computer_cards[0]}")
+    user_card = []
+    computer_card = []
+    game_end = False
+    for i in range(0, 2):
+        user_card.append(deal_card())
+        computer_card.append(deal_card())
+    while not game_end:
+        user_score = calculate_score(user_card)
+        computer_score = calculate_score(computer_card)
+        clear_screen()
+        print(logo)
+        print(f"Your cards are {user_card} SCORE :{user_score}")
+        print(f"Dealer_card is [{computer_card[0]},unknown]")
         if user_score == 0 or computer_score == 0 or user_score > 21:
-            is_game_finished = True
+            game_end = True
         else:
-            user_prompt = input("Do you want to take another card ? 'y' or 'n' ").lower()
+            user_prompt = input("Do you want to draw another card ? Y/N  ").lower()
             if user_prompt == 'y':
-                user_cards.append(deal_card())
+                user_card.append(deal_card())
             else:
-                is_game_finished = True
+                # TODO Let computer draw cards until the score is less than 17
+                game_end = True
 
-    while computer_score != 0 and computer_score < 17:
-        computer_cards.append(deal_card())
-        computer_score = calculate_score(computer_cards)
+    while computer_score != 0 and user_score != 0 and computer_score < 17:
+        computer_card.append(deal_card())
+        computer_score = calculate_score(computer_card)
 
-    print(f"final cards {user_cards} with score {user_score}")
-    print(f"final card of Computer {computer_cards} with score {computer_score}")
-    print(compare(user_score, computer_score))
-    user_restart = input("Do you want to restart the game 'y' or 'n' ").lower()
+    print(f"The dealer cards were {computer_card} Score: [{computer_score}].")
+    print(compare(user_total=user_score, computer_total=computer_score))
+    user_restart = input("Do you want to  restart Blackjack ? Y/N ").lower()
 
